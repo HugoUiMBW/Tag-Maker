@@ -395,6 +395,26 @@
     <div id="print-4x6-area" class="print-area hidden"></div>
 
     <script>
+        // --- ADDED FUNCTION TO LOAD DATA FROM URL ---
+        function loadTagsFromUrl() {
+            // Check if there is data in the URL hash
+            if (window.location.hash && window.location.hash.length > 1) {
+                try {
+                    const dataParam = window.location.hash.substring(1); // Remove '#'
+                    const decodedJson = atob(dataParam);
+                    const parsedData = JSON.parse(decodedJson);
+                    
+                    // If the parsed data is a valid array and not empty...
+                    if (Array.isArray(parsedData) && parsedData.length > 0) {
+                        // ...overwrite the default sample data with the data from the URL.
+                        tagsData = parsedData.map(tag => ({ ...tag, id: Date.now() + Math.random() }));
+                    }
+                } catch (error) {
+                    console.error("Failed to parse data from URL:", error);
+                }
+            }
+        }
+
         // --- STATE MANAGEMENT ---
         let tagsData = [
             { id: Date.now(), brand: 'ACME Foods', product: 'Organic Apples', dollars: '3', cents: '99', sale: '/LB', barcode: '1234567890128' },
@@ -412,25 +432,6 @@
         const previewTagsBtn = document.getElementById('preview-tags-btn');
         const previewLetterBtn = document.getElementById('preview-letter-btn');
         const preview4x6Btn = document.getElementById('preview-4x6-btn');
-
-        function loadTagsFromUrl() {
-  // Check if there is data in the URL hash
-  if (window.location.hash) {
-    try {
-      const dataParam = window.location.hash.substring(1); // Remove '#'
-      const decodedJson = atob(dataParam);
-      const parsedData = JSON.parse(decodedJson);
-      
-      // If the parsed data is a valid array and not empty...
-      if (Array.isArray(parsedData) && parsedData.length > 0) {
-        // ...overwrite the default sample data with the data from the URL.
-        tagsData = parsedData.map(tag => ({ ...tag, id: Date.now() + Math.random() }));
-      }
-    } catch (error) {
-      console.error("Failed to parse data from URL:", error);
-    }
-  }
-}
 
         // --- RENDERING FUNCTIONS ---
         function renderPreview() {
@@ -843,8 +844,8 @@
         document.getElementById('direct-4x6').addEventListener('click', () => generateDirectPdf('4x6'));
 
         // --- INITIALIZE ---
-        renderPreview();
         loadTagsFromUrl();
+        renderPreview();
     </script>
 </body>
 </html>
